@@ -1,0 +1,233 @@
+# Canvas Group 2
+
+# Group leader: 1273607, MATTHEWTP, Matthew Pham
+# Members: 1171464, HRIGNEY, Heath Rigney
+# Members: 1171302, FNORONHANEHR, Frederick Noronha-nehrnmann
+
+
+README:
+
+IMPORTANT:
+    decision_tree_full.png and decision_tree.png is provided for the 
+    Ed submission due to issues with generating the png unrelated to the
+    functioning of the codeLook at decriptions of python programs 
+    (data_analysis.py)for reasoning.
+
+Basic Instructions (On Ed):
+
+The initial state of the source files should appear as:
+
+    
+    CSVFILES (folder)
+    Data_sets (folder)
+        Counts (folder)
+    Graphs (folder)
+    Scatter_plots (folder)
+    TXT_FILES (folder)
+    README
+    access_data.py
+    concatinate_data.py
+    data_analysis.py
+    encode_bin_data.py
+    initial_impute_clean_data.py
+    main.py
+    project_group002.pdf
+    scatter_plots.py
+
+The code is intended to work at minimum on these files on Ed.
+
+To run the program, type (in terminal): 
+
+     ---->  python main.py all
+
+    -   This should run the program and generate all the necessary files
+
+    -   To run any task (taskname.py) individually you can type (in terminal):
+
+     ---->  python main.py taskname
+
+    -   Output is generated in the terminal and contains data figures 
+        used for analysis, as well as a general overview of what is
+        happening in the code
+
+    -   Output can also be used to verify that certain important files
+        are being outputted. The only ones that are not checked are those in
+        Data_sets/Counts and in Scatter_plots, as they do not contribute to
+        the running of the program, nor are necessary in the evaluation of
+        the supervised ML model.
+
+(Further instructions for alternative coding environments)
+
+The base data set files must be accessed on Ed
+
+To access these files, type on Ed (in terminal):
+
+    ---->  python main.py access_data
+
+    -   Download the source files and open containing folder
+        in coding environment of choice
+
+    -   Type (in terminal):
+
+    ---->  python main.py alt_all
+    
+    -   This should run every task other than access_data.
+        using access_data will fail as the source files do
+        not exist independently of Ed.
+
+
+Description of python programs:
+
+main.py:
+    Is used to run all other python programs
+
+    See above for basic instructions on how to use main.py.
+
+access_data.py:
+    Accesses files from Ed and stores them in Data_sets folder
+
+    Outputs:
+        to Data_sets:
+            EUmatch.csv
+            NAmatch.csv
+            KRmatch.csv
+
+concatinate_data.py:
+    Takes csv files in Data_sets folder and combines them into 
+        ALL_REGIONS.csv
+
+    Also finds statistics concerning the distribution of champions
+        and the number of cells missing in each data set
+
+    Ouputs:
+        to CSVFILES:
+            ALL_REGIONS.csv
+
+        to Data_sets/Counts:
+            EU_champ_counts.csv
+            EU_missing_entries
+            KR_champ_counts.csv
+            KR_missing_entries
+            NA_champ_counts.csv
+            NA_missing_entries
+
+scatter_plots.py
+    Creates scatter plot that show the relationships between features in the
+        data set
+    
+    Outputs:
+        to Scatter_plots:
+            A variety of scatter plots in a png format
+
+initial_impute_clean_data.py:
+    Imputes empty data where possible in {damage_objectives, damage_turrets}
+        and {kills, kda, assists, deaths}
+    Converts d_spell and f_spell to machine readable input e.g. '[12.0, 4.0]'
+    Removes unnecessary columns, made obselete by the processes above
+    Removes rows containing 'nan' values for champions and summoner_spells
+    Removes duplicates
+
+    Outputs:
+        to CSVFILES:
+            CLEAN_REGION_DATA.csv
+        
+        to Graphs:
+            pre_summoner_spells.png
+            pre_summoner_spells.png
+
+encode_bin_data.py:
+    Generates and alternate csv file based on CLEAN_REGIONS_DATA,csv where
+        data is encoded and binned for later processing
+    
+    Outputs:
+        to CSVFILES:
+            BINNED_DATA.csv
+            BINNED_DATA_ENCODES.json
+
+data_analysis:
+    Analyses relationship between summoner_spells and features of the 
+        binned data set by calculating NMI between summoner_spells and 
+        every feature individually.
+
+    Uses BINNED_DATA.csv to generate an 80/20 train-test split set of 
+        data for supervised ML model evaluation (preventing data leakage)
+
+    Evaluates best model for data set using K-Fold method on training data set:
+        Choice of models:
+            Decision tree:
+                Choice of using 1-5 features
+                Choice of using gini or entropy to determine splits
+            KNN:
+                Choice of using from 3 - 7 Neighbours
+
+        ( Note: Best model was usually a Decision Tree with 3-4 features, 
+          with an incredibly marginal difference between the two in terms of 
+          performance ))
+    
+    Trains a Decision Tree with the optimal amount of features:
+        Generates a confusion matrix
+        Evaluates results using evaluative statistics 
+
+    Outputs:
+        to Graphs:
+            confusion_matrix.png
+            decision_tree.png (See Below)
+
+        to TXT_FILES:
+            final_model_ealuation.txt
+
+    About decision_tree.png:
+        The following chunk of code seems to crash jupyter notebooks and
+        kills the python terminal when run on Ed's integrated terminal.
+
+            --------------------------------------------------------------
+            plt.figure(figsize=(10, 15))
+            plot_tree(dt, 
+                    feature_names=filtered_features, 
+                    class_names=class_labels, 
+                    filled=True, 
+                    fontsize = 6
+                    )
+            plt.title("Decision Tree Classifier")
+            plt.savefig('Graphs/decision_tree.png', bbox_inches = "tight")
+            --------------------------------------------------------------
+
+        The code that specifically breaks this is:
+
+            -   plt.figure(figsize=(10, 15))
+
+        where figsize is only able to go from (0~90,0~100)
+        before killing the program (simply estimates, we're still unsure 
+        what exactly the limits of the function are before the function 
+        force-terminates itself)
+
+        We're uncertain why this is the case, but assume it's due to Ed
+        rather than an error in code, as testing in VSCODE has been able
+        to generate and save the png both in jupyter and regular python
+        programs.
+
+        As you can see in the Graphs, we have pre-generated 
+        decision_tree.png and decision_tree_full.png and outside of Ed, 
+        requiring a figsize of around (150, 90), which Ed cannot do 
+        without the program being terminated.
+        
+        Generating decision_tree.png in Ed impeded on the function of 
+        the source code as a whole, so we decided to allow users to 
+        download the code and run it offline to better see the results.
+
+        Additionally, although the program can run and generate 
+        decision_tree.png, at least with the current settings, this was
+        too unpredicatable to warrant enabling the png generation by 
+        default.
+
+        Instead, users can enable the generation of decision_tree.png by 
+        going into data_analysis.py and, on line 268, making 
+        GENERATE_DECISION_TREE_PNG = True. Generating decision_tree.png 
+        however takes a considerable amount of time considering due to 
+        its complexity.
+
+        
+
+
+
+        
